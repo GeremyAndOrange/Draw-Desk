@@ -36,5 +36,6 @@ if ($null -eq $process) {
     throw "无法启动进程: $exe"
 }
 
+Write-Output 'DrawDesk 已启动. 关闭主窗口时请选择退出程序, 本脚本才会结束; 选择最小化到托盘后程序会继续在后台运行.'
 $process.WaitForExit()
 exit $process.ExitCode

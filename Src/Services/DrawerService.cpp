@@ -1,6 +1,7 @@
 // 文件用途: 抽屉服务实现, 处理窗口归属, 场景切换, 添加移除与恢复全部
 #include "Services/DrawerService.h"
 
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
@@ -205,6 +206,13 @@ void DrawerService::RestoreAll()
     else
         Notify(QStringLiteral("没有需要恢复的窗口"));
 }
+void DrawerService::QuitApplication()
+{
+    qInfo("已请求退出程序");
+    if (QCoreApplication::instance())
+        QMetaObject::invokeMethod(QCoreApplication::instance(), "quit", Qt::QueuedConnection);
+}
+
 void DrawerService::RemoveRule(int drawerIndex, int ruleIndex)
 {
     if (drawerIndex < 0 || drawerIndex >= m_drawers.size())

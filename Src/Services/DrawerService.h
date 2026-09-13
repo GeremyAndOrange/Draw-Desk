@@ -42,6 +42,9 @@ public:
     // 恢复全部由本程序隐藏的窗口以及规则覆盖的隐藏窗口
     Q_INVOKABLE void RestoreAll();
 
+    // 请求程序退出, 由 C++ 排队处理, 避免在关闭事件里同步退出
+    Q_INVOKABLE void QuitApplication();
+
     // 从抽屉移除指定序号的窗口条目
     Q_INVOKABLE void RemoveRule(int drawerIndex, int ruleIndex);
 

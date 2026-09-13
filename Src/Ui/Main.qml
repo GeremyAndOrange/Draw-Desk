@@ -39,7 +39,7 @@ Window {
     function quitApplication() {
         if (managerWindowRef)
             managerWindowRef.readyToQuit = true;
-        Qt.quit();
+        drawerService.QuitApplication();
     }
 
     function toggleFloatingWindow() {
@@ -1692,6 +1692,7 @@ Window {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
+                                    console.log("ui: minimize to tray");
                                     closeLayer.visible = false;
                                     managerWindow.hide();
                                 }
@@ -1713,7 +1714,10 @@ Window {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: window.quitApplication()
+                                onClicked: {
+                                    managerWindow.readyToQuit = true;
+                                    drawerService.QuitApplication();
+                                }
                             }
                         }
                     }
