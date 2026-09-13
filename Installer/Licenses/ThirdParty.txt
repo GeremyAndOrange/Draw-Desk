@@ -1,0 +1,11 @@
+第三方组件与许可说明
+
+---
+
+- DrawDesk 自身代码: MIT License, 见安装目录下的 LICENSE.
+- Qt 6.11.2: 以 LGPL v3 动态链接方式使用. Qt 的动态库与 QML 模块随本程序一起分发,
+  用户可以用兼容版本替换这些动态库. Qt 源码获取地址: https://download.qt.io/official_releases/qt/
+  Qt 许可文本见 Qt-License.txt, 其中包含 LGPL v3 与 GPL v3 全文.
+- MinGW-w64 运行库: GCC Runtime Library Exception, 随程序分发 libgcc, libstdc++ 与
+  libwinpthread 等运行库. 许可证文本见 https://gcc.gnu.org/onlinedocs/libstdc++/manual/license.html
+- 本程序为独立进程, 未修改 Qt 与 MinGW 源码.
