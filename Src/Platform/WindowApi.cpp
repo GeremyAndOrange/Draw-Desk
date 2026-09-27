@@ -235,6 +235,13 @@ bool IsWindowManageable(HWND handle, bool includeCloaked)
     if (processId == GetCurrentProcessId())
         return false;
 
+    // UWP 窗口由 ApplicationFrameHost 承载, DWM Cloak 行为不稳定, 不参与管理
+    const QString processName = ProcessNameOf(processId);
+    if (QString::compare(processName, QStringLiteral("ApplicationFrameHost.exe"),
+                         Qt::CaseInsensitive)
+        == 0)
+        return false;
+
     if (!includeCloaked && IsCloaked(handle))
         return false;
 
@@ -331,18 +338,47 @@ bool SetCloaked(HWND handle, bool cloaked)
     const BOOL value = cloaked ? TRUE : FALSE;
     const HRESULT result = DwmSetWindowAttribute(handle, DWMWA_CLOAK, &value, sizeof(value));
     if (SUCCEEDED(result)) {
-        // 恢复时, 若窗口曾被回退方式隐藏, 需要重新显示
-        if (!cloaked && !IsWindowVisible(handle))
-            ShowWindow(handle, SW_SHOWNA);
+        if (!cloaked) {
+            // 恢复时, 若窗口曾被回退方式隐藏, 需要重新显示
+            if (!IsWindowVisible(handle))
+                ShowWindow(handle, SW_SHOWNA);
+            RefreshWindow(handle);
+        }
         return true;
     }
 
-    qWarning().noquote() << "DWM 隐藏调用失败, 句柄:" << reinterpret_cast<quintptr>(handle)
-                         << "HRESULT: 0x" << QString::number(static_cast<quint32>(result), 16);
+    DWORD processId = 0;
+    GetWindowThreadProcessId(handle, &processId);
+    const QString processName = ProcessNameOf(processId);
+    qWarning().noquote()
+        << QStringLiteral("DWM %1调用失败, 进程: %2, 句柄: %3, HRESULT: 0x%4")
+               .arg(cloaked ? QStringLiteral("隐藏") : QStringLiteral("恢复"), processName,
+                    QString::number(reinterpret_cast<quintptr>(handle)),
+                    QString::number(static_cast<quint32>(result), 16));
 
-    // 回退方案: 使用标准显示与隐藏, 保证切换功能可用
+    // 回退方案: 使用标准显示与隐藏, 恢复后强制刷新, 减少 DWM 合成残影
     ShowWindow(handle, cloaked ? SW_HIDE : SW_SHOWNA);
+    if (!cloaked)
+        RefreshWindow(handle);
     return true;
+}
+
+void RefreshWindow(HWND handle)
+{
+    if (!handle || !IsWindow(handle))
+        return;
+
+    // 异步提交框架变化, 避免目标窗口不响应时阻塞当前线程
+    SetWindowPos(handle, nullptr, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE
+                     | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS | SWP_SHOWWINDOW);
+    RedrawWindow(handle, nullptr, nullptr,
+                 RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN | RDW_ERASE);
+}
+
+void FlushComposition()
+{
+    DwmFlush();
 }
 
 void UncloakAndActivate(HWND handle)
@@ -359,6 +395,7 @@ void UncloakAndActivate(HWND handle)
     if (IsIconic(handle))
         ShowWindow(handle, SW_RESTORE);
 
+    RefreshWindow(handle);
     SetForegroundWindow(handle);
 }
 

@@ -81,6 +81,12 @@ bool IsCloaked(HWND handle);
 // 设置窗口的 DWM 隐藏状态, 返回调用是否成功
 bool SetCloaked(HWND handle, bool cloaked);
 
+// 强制窗口重绘并同步框架, 用于恢复后避免 DWM 残影
+void RefreshWindow(HWND handle);
+
+// 等待 DWM 处理完当前合成队列
+void FlushComposition();
+
 
 // 确保窗口可见并激活到前台
 void UncloakAndActivate(HWND handle);

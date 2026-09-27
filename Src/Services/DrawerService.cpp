@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QEventLoop>
 #include <QDebug>
 #include <QFile>
 #include <QJsonArray>
@@ -63,6 +64,8 @@ bool DrawerService::Load()
 void DrawerService::SwitchTo(int index)
 {
     if (index < 0 || index >= m_drawers.size() || index == m_activeIndex)
+        return;
+    if (m_restoring)
         return;
 
     PruneStaleProcessIds();
@@ -173,7 +176,14 @@ void DrawerService::RemoveForegroundWindowFromDrawer(int index)
 
 void DrawerService::RestoreAll()
 {
+    if (m_restoring) {
+        Notify(QStringLiteral("正在恢复窗口, 请稍候"));
+        return;
+    }
+    m_restoring = true;
+
     int restored = 0;
+    int processed = 0;
 
     const auto recorded = m_cloakedWindows;
     for (const quintptr key : recorded) {
@@ -182,6 +192,10 @@ void DrawerService::RestoreAll()
             ++restored;
         m_cloakedWindows.remove(key);
         m_cloakedInfo.remove(key);
+
+        // 分批处理, 给 DWM 和应用留出重绘时间
+        if ((++processed % 8) == 0)
+            QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
     }
 
     // 恢复规则覆盖但本次会话未记录的隐藏窗口, 应对上次异常退出
@@ -190,6 +204,9 @@ void DrawerService::RestoreAll()
         if (DrawerIndexOf(info) >= 0 && WindowApi::IsCloaked(info.handle)) {
             if (WindowApi::SetCloaked(info.handle, false))
                 ++restored;
+
+            if ((++processed % 8) == 0)
+                QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         }
     }
 
@@ -199,6 +216,10 @@ void DrawerService::RestoreAll()
     m_cloakedWindows.clear();
     m_cloakedInfo.clear();
     PersistCloakedState();
+
+    // 等 DWM 把这一批窗口的合成变化处理完, 避免残影
+    WindowApi::FlushComposition();
+    m_restoring = false;
 
     qInfo().noquote() << "恢复全部窗口, 共恢复:" << restored;
     if (restored > 0)
@@ -1029,6 +1050,8 @@ void DrawerService::ApplyVisibility()
                       << shown << "个, 恢复" << released << "个, 活动抽屉:" << activeName;
 
     PersistCloakedState();
+    if (hidden + shown + released > 0)
+        WindowApi::FlushComposition();
 }
 
 bool DrawerService::CloakWindow(HWND handle)

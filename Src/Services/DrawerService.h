@@ -162,6 +162,7 @@ private:
     QSet<quintptr> m_cloakedWindows;
     QHash<quintptr, WindowApi::WindowInfo> m_cloakedInfo;
     bool m_persistChanges = true;
+    bool m_restoring = false;
     int m_activeIndex = 0;
 };
 

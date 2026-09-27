@@ -91,7 +91,9 @@ DrawDesk\
 - 使用 DWM 隐藏,即 `DwmSetWindowAttribute` 的 `DWMWA_CLOAK` 属性,隐藏后窗口仍在运行,但不出现在屏幕,任务栏与 Alt+Tab
 - 显示时写回 `FALSE`;使用 `DwmGetWindowAttribute` 的 `DWMWA_CLOAKED` 查询当前状态
 - 不使用移出屏幕或隐藏父窗口等替代方案,原因是任务栏残留,还原闪烁与恢复困难
-- 调用失败时,该窗口记入不可控制列表并在界面提示,常见原因是目标窗口以管理员权限运行
+- 调用失败时回退到 `ShowWindow` 并记录日志,恢复时用 `SetWindowPos` 与 `RedrawWindow` 强制刷新,减少 DWM 残影
+- 批量恢复分批执行,并调用 `DwmFlush` 等待合成队列,避免一帧内处理过多窗口
+- `ApplicationFrameHost` 承载的 UWP 窗口不参与管理,避免其不稳定的 Cloak 行为影响桌面
 
 ### 4.3 抽屉切换流程
 
