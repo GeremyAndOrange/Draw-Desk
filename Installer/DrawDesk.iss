@@ -1,6 +1,6 @@
 ; 文件用途: Inno Setup 安装脚本, 把 Payload 下的便携目录打成 Windows 安装包
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.1.1"
 #endif
 
 #define AppName "DrawDesk"

@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName(QStringLiteral("DrawDesk"));
     QCoreApplication::setApplicationName(QStringLiteral("DrawDesk"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.1.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.1.1"));
 
     // 窗口与任务栏图标
     app.setWindowIcon(QIcon(QStringLiteral(":/qt/qml/DrawDesk/Src/Ui/AppIcon.svg")));
