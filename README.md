@@ -3,7 +3,7 @@
 > 一个面向 Windows 的窗口与工作区管理工具:把不同任务场景的窗口收进抽屉, 一键切换, 自动恢复布局.
 
 仓库: https://github.com/GeremyAndOrange/Draw-Desk
-当前版本: 0.1.1
+当前版本: 0.2.0
 
 [产品说明](Docs/Product.md) · [编译与操作手册](Docs/Manual.md) · [详细设计](Docs/Design.md) · [文件说明](Docs/Files.md)
 

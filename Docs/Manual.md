@@ -71,8 +71,8 @@
 
 1. 执行 `Scripts\Package.ps1 -Config Release`
 2. 在 GitHub 仓库页面打开 Releases, 点击 Draft a new release
-3. 标签填 `v0.1.1`, 标题填 `DrawDesk 0.1.1`
-4. 上传 `Installer\Output\DrawDesk-0.1.1-portable.zip` 与 `DrawDeskSetup-0.1.1.exe`
+3. 标签填 `v0.2.0`, 标题填 `DrawDesk 0.2.0`
+4. 上传 `Installer\Output\DrawDesk-0.2.0-portable.zip` 与 `DrawDeskSetup-0.2.0.exe`
 5. 发布后 README 的下载入口即可直接使用
 
 ### 3.3 安装包说明

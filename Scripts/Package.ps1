@@ -23,7 +23,7 @@ $payload = Join-Path $payloadParent 'DrawDesk'
 $outputDir = Join-Path $root 'Installer\Output'
 
 $cmakeText = Get-Content (Join-Path $root 'CMakeLists.txt') -Raw -Encoding UTF8
-$version = '0.1.1'
+$version = '0.2.0'
 if ($cmakeText -match 'VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)') {
     $version = $Matches[1]
 }
