@@ -641,8 +641,6 @@ bool DrawerService::RemoveTodo(int drawerIndex, int todoIndex)
     return true;
 }
 
-
-
 QStringList DrawerService::SearchWindows(const QString &keyword)
 {
     m_searchResults.clear();

@@ -12,4 +12,5 @@ private slots:
     void ruleMatching();
     void configRoundTrip();
     void legacyConfigMigration();
+    void todoOperations();
 };

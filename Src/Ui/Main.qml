@@ -279,25 +279,21 @@ Window {
             }
 
             function addTodo() {
-                if (drawerService.AddTodo(selectedIndex, todoInput.text)) {
+                if (drawerService.AddTodo(selectedIndex, todoInput.text))
                     todoInput.text = "";
-                    refreshTodos();
-                }
             }
 
             function toggleTodo(todoIndex, done) {
                 drawerService.SetTodoDone(selectedIndex, todoIndex, done);
-                refreshTodos();
             }
 
             function updateTodo(todoIndex, text) {
-                drawerService.UpdateTodoText(selectedIndex, todoIndex, text);
-                refreshTodos();
+                if (!drawerService.UpdateTodoText(selectedIndex, todoIndex, text))
+                    Qt.callLater(function() { refreshTodos(); });
             }
 
             function removeTodo(todoIndex) {
                 drawerService.RemoveTodo(selectedIndex, todoIndex);
-                refreshTodos();
             }
 
             function refreshHotkeyInput() {
@@ -395,7 +391,7 @@ Window {
                 }
 
                 function onTodosChanged() {
-                    managerWindow.refreshTodos();
+                    Qt.callLater(function() { managerWindow.refreshTodos(); });
                 }
 
             }

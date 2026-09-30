@@ -13,6 +13,7 @@
 #include "Platform/ConfigStore.h"
 #include "Platform/HotkeyService.h"
 #include "Platform/WindowApi.h"
+#include "Services/DrawerService.h"
 
 void DrawDeskTests::hotkeyParsing()
 {
@@ -196,4 +197,53 @@ void DrawDeskTests::legacyConfigMigration()
 
     QDir(dataDir).removeRecursively();
 }
+
+void DrawDeskTests::todoOperations()
+{
+    DrawDesk::Services::DrawerService service;
+
+    DrawDesk::Models::Drawer drawer;
+    drawer.id = QStringLiteral("todo");
+    drawer.name = QStringLiteral("待办测试");
+
+    DrawDesk::Models::TodoItem doneTodo;
+    doneTodo.text = QStringLiteral("已完成");
+    doneTodo.done = true;
+    drawer.todos.append(doneTodo);
+
+    DrawDesk::Models::TodoItem pendingTodo;
+    pendingTodo.text = QStringLiteral("未完成");
+    drawer.todos.append(pendingTodo);
+
+    QVector<DrawDesk::Models::Drawer> drawers;
+    drawers.append(drawer);
+    service.SetDrawersForTest(drawers);
+
+    QCOMPARE(service.PendingTodoCount(0), 1);
+    QVariantList items = service.TodoItems(0);
+    QCOMPARE(items.size(), 2);
+    QCOMPARE(items.at(0).toMap().value(QStringLiteral("index")).toInt(), 1);
+    QCOMPARE(items.at(0).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("未完成"));
+    QCOMPARE(items.at(1).toMap().value(QStringLiteral("index")).toInt(), 0);
+    QVERIFY(items.at(1).toMap().value(QStringLiteral("done")).toBool());
+
+    QVERIFY(service.AddTodo(0, QStringLiteral("新待办")));
+    QCOMPARE(service.PendingTodoCount(0), 2);
+    QVERIFY(!service.AddTodo(0, QStringLiteral("   ")));
+    QVERIFY(!service.AddTodo(0, QString(201, QLatin1Char('a'))));
+
+    QVERIFY(service.SetTodoDone(0, 0, false));
+    QCOMPARE(service.PendingTodoCount(0), 3);
+
+    QVERIFY(service.UpdateTodoText(0, 1, QStringLiteral("未完成修改")));
+    items = service.TodoItems(0);
+    QCOMPARE(items.at(1).toMap().value(QStringLiteral("text")).toString(),
+             QStringLiteral("未完成修改"));
+    QVERIFY(!service.UpdateTodoText(0, 1, QStringLiteral("   ")));
+
+    QVERIFY(service.RemoveTodo(0, 0));
+    QCOMPARE(service.PendingTodoCount(0), 2);
+    QVERIFY(!service.RemoveTodo(0, 99));
+}
+
 QTEST_MAIN(DrawDeskTests)

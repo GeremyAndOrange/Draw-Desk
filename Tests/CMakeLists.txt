@@ -7,6 +7,7 @@ qt_add_executable(DrawDeskTests
     ${CMAKE_SOURCE_DIR}/Src/Platform/Log.cpp
     ${CMAKE_SOURCE_DIR}/Src/Platform/WindowApi.cpp
     ${CMAKE_SOURCE_DIR}/Src/Platform/HotkeyService.cpp
+    ${CMAKE_SOURCE_DIR}/Src/Services/DrawerService.cpp
 )
 
 target_include_directories(DrawDeskTests PRIVATE ${CMAKE_SOURCE_DIR}/Src)
@@ -33,5 +34,6 @@ endif()
 set_target_properties(DrawDeskTests PROPERTIES WIN32_EXECUTABLE FALSE)
 
 drawdesk_add_moc(DrawDeskTests Tests/DrawDeskTests.h)
+drawdesk_add_moc(DrawDeskTests Src/Services/DrawerService.h)
 
 add_test(NAME DrawDeskTests COMMAND DrawDeskTests)
