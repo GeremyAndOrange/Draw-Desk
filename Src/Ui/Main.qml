@@ -1077,6 +1077,16 @@ Window {
                             border.width: 1
                             border.color: "#E5E7EB"
 
+                            Text {
+                                anchors.left: parent.left
+                                anchors.leftMargin: 8
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: todoInput.text.length === 0
+                                text: qsTr("新增待办, 回车或点添加")
+                                font.pixelSize: 11
+                                color: "#9AA0A6"
+                            }
+
                             TextInput {
                                 id: todoInput
                                 anchors.fill: parent
@@ -1085,7 +1095,6 @@ Window {
                                 verticalAlignment: TextInput.AlignVCenter
                                 font.pixelSize: 12
                                 color: "#1F2328"
-                                placeholderText: qsTr("新增待办, 回车或点添加")
                                 selectByMouse: true
                                 clip: true
                                 onAccepted: managerWindow.addTodo()
