@@ -300,11 +300,6 @@ Window {
                 refreshTodos();
             }
 
-            function clearCompletedTodos() {
-                drawerService.ClearCompletedTodos(selectedIndex);
-                refreshTodos();
-            }
-
             function refreshHotkeyInput() {
                 if (selectedIndex >= 0 && selectedIndex < drawerService.drawerNames.length)
                     drawerHotkeyInput.text = drawerService.DrawerHotkey(selectedIndex);
@@ -1129,10 +1124,10 @@ Window {
                         anchors.topMargin: 6
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        anchors.bottom: todoBottomArea.top
+                        anchors.bottom: parent.bottom
                         anchors.leftMargin: 12
                         anchors.rightMargin: 12
-                        anchors.bottomMargin: 8
+                        anchors.bottomMargin: 12
                         spacing: 4
                         clip: true
                         model: managerWindow.todoItems
@@ -1227,45 +1222,7 @@ Window {
                         color: "#9AA0A6"
                     }
 
-                    // 待办底部操作
-                    Row {
-                        id: todoBottomArea
-                        visible: managerWindow.todoMode
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 10
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        height: 24
-                        spacing: 8
 
-                        Rectangle {
-                            width: 86
-                            height: 24
-                            radius: 7
-                            color: "#F3F4F6"
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: qsTr("清除已完成")
-                                font.pixelSize: 11
-                                color: "#4B5563"
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: managerWindow.clearCompletedTodos()
-                            }
-                        }
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("未完成 ") + managerWindow.pendingTodoCount + qsTr(" 条")
-                            font.pixelSize: 11
-                            color: "#6B7280"
-                        }
-                    }
 
                     // 搜索框: 输入关键字后, 下方列表变为搜索结果
                     Rectangle {

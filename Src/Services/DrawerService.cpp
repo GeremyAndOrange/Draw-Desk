@@ -641,28 +641,7 @@ bool DrawerService::RemoveTodo(int drawerIndex, int todoIndex)
     return true;
 }
 
-int DrawerService::ClearCompletedTodos(int drawerIndex)
-{
-    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
-        return 0;
 
-    auto &todos = m_drawers[drawerIndex].todos;
-    int removed = 0;
-    for (int i = todos.size() - 1; i >= 0; --i) {
-        if (todos.at(i).done) {
-            todos.removeAt(i);
-            ++removed;
-        }
-    }
-
-    if (removed > 0) {
-        if (m_persistChanges)
-            ConfigStore::SaveDrawers(m_drawers);
-        emit todosChanged();
-        Notify(QStringLiteral("已清除 %1 条已完成待办").arg(removed));
-    }
-    return removed;
-}
 
 QStringList DrawerService::SearchWindows(const QString &keyword)
 {
