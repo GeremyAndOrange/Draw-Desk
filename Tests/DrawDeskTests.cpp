@@ -108,6 +108,15 @@ void DrawDeskTests::configRoundTrip()
     rule.useRegex = true;
     drawer.rules.append(rule);
 
+    DrawDesk::Models::TodoItem pendingTodo;
+    pendingTodo.text = QStringLiteral("完成登录页");
+    drawer.todos.append(pendingTodo);
+
+    DrawDesk::Models::TodoItem doneTodo;
+    doneTodo.text = QStringLiteral("补充单元测试");
+    doneTodo.done = true;
+    drawer.todos.append(doneTodo);
+
     DrawDesk::Models::WindowLayout layout;
     layout.process = QStringLiteral("Test.exe");
     layout.titlePattern = QStringLiteral("^测试");
@@ -128,6 +137,11 @@ void DrawDeskTests::configRoundTrip()
     QCOMPARE(loaded.at(0).rules.size(), 1);
     QCOMPARE(loaded.at(0).rules.at(0).processId, 88);
     QVERIFY(loaded.at(0).rules.at(0).useRegex);
+    QCOMPARE(loaded.at(0).todos.size(), 2);
+    QCOMPARE(loaded.at(0).todos.at(0).text, QStringLiteral("完成登录页"));
+    QVERIFY(!loaded.at(0).todos.at(0).done);
+    QVERIFY(loaded.at(0).todos.at(1).done);
+
     QCOMPARE(loaded.at(0).layout.size(), 1);
     QCOMPARE(loaded.at(0).layout.at(0).processId, 77);
     QCOMPARE(loaded.at(0).layout.at(0).showCommand, 3);

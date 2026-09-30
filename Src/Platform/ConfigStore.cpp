@@ -150,12 +150,21 @@ QJsonObject DrawerToJson(const DrawDesk::Models::Drawer &drawer)
         layout.append(layoutObject);
     }
 
+    QJsonArray todos;
+    for (const auto &todo : drawer.todos) {
+        QJsonObject todoObject;
+        todoObject[QStringLiteral("text")] = todo.text;
+        todoObject[QStringLiteral("done")] = todo.done;
+        todos.append(todoObject);
+    }
+
     QJsonObject object;
     object[QStringLiteral("id")] = drawer.id;
     object[QStringLiteral("name")] = drawer.name;
     object[QStringLiteral("hotkey")] = drawer.hotkey;
     object[QStringLiteral("rules")] = rules;
     object[QStringLiteral("layout")] = layout;
+    object[QStringLiteral("todos")] = todos;
 
     return object;
 }
@@ -195,6 +204,15 @@ DrawDesk::Models::Drawer DrawerFromJson(const QJsonObject &object)
         item.useRegex = layoutObject.value(QStringLiteral("titleRegex")).toBool(false);
         if (!item.process.isEmpty())
             drawer.layout.append(item);
+    }
+
+    for (const auto &todoValue : object.value(QStringLiteral("todos")).toArray()) {
+        const QJsonObject todoObject = todoValue.toObject();
+        DrawDesk::Models::TodoItem todo;
+        todo.text = todoObject.value(QStringLiteral("text")).toString();
+        todo.done = todoObject.value(QStringLiteral("done")).toBool(false);
+        if (!todo.text.isEmpty())
+            drawer.todos.append(todo);
     }
 
     if (drawer.name.isEmpty())

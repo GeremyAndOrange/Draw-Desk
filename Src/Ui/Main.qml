@@ -250,6 +250,10 @@ Window {
             property string searchKeyword: ""
             readonly property bool searchActive: searchKeyword.length > 0
 
+            property bool todoMode: false
+            property var todoItems: []
+            property int pendingTodoCount: 0
+
             function resetSearch() {
                 searchKeyword = "";
                 searchResults = [];
@@ -262,6 +266,43 @@ Window {
                 searchResults = searchKeyword.length > 0
                         ? drawerService.SearchWindows(searchKeyword) : [];
                 refreshDetails();
+            }
+
+            function refreshTodos() {
+                if (selectedIndex >= 0 && selectedIndex < drawerService.drawerNames.length) {
+                    todoItems = drawerService.TodoItems(selectedIndex);
+                    pendingTodoCount = drawerService.PendingTodoCount(selectedIndex);
+                } else {
+                    todoItems = [];
+                    pendingTodoCount = 0;
+                }
+            }
+
+            function addTodo() {
+                if (drawerService.AddTodo(selectedIndex, todoInput.text)) {
+                    todoInput.text = "";
+                    refreshTodos();
+                }
+            }
+
+            function toggleTodo(todoIndex, done) {
+                drawerService.SetTodoDone(selectedIndex, todoIndex, done);
+                refreshTodos();
+            }
+
+            function updateTodo(todoIndex, text) {
+                drawerService.UpdateTodoText(selectedIndex, todoIndex, text);
+                refreshTodos();
+            }
+
+            function removeTodo(todoIndex) {
+                drawerService.RemoveTodo(selectedIndex, todoIndex);
+                refreshTodos();
+            }
+
+            function clearCompletedTodos() {
+                drawerService.ClearCompletedTodos(selectedIndex);
+                refreshTodos();
             }
 
             function refreshHotkeyInput() {
@@ -287,6 +328,7 @@ Window {
                     windowDetails = [];
                     previewRects = [];
                 }
+                refreshTodos();
             }
 
             function commitRename() {
@@ -305,11 +347,13 @@ Window {
                     mainRenameInput.text = drawerService.drawerNames[selectedIndex];
                 refreshDetails();
                 refreshHotkeyInput();
+                refreshTodos();
             }
             onVisibleChanged: {
                 if (visible) {
                     refreshDetails();
                     refreshHotkeyInput();
+                    refreshTodos();
                 }
             }
 
@@ -352,6 +396,11 @@ Window {
                             Math.max(0, drawerService.drawerNames.length - 1);
                     managerWindow.refreshDetails();
                     managerWindow.refreshHotkeyInput();
+                    managerWindow.refreshTodos();
+                }
+
+                function onTodosChanged() {
+                    managerWindow.refreshTodos();
                 }
 
             }
@@ -590,7 +639,10 @@ Window {
                         Text {
                             visible: !managerWindow.renaming
                             anchors.left: parent.left
+                            anchors.right: viewTabs.left
+                            anchors.rightMargin: 6
                             anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
                             text: managerWindow.selectedIndex >= 0
                                   && managerWindow.selectedIndex < drawerService.drawerNames.length
                                   ? drawerService.drawerNames[managerWindow.selectedIndex]
@@ -604,8 +656,8 @@ Window {
                             id: mainRenameInput
                             visible: managerWindow.renaming
                             anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.rightMargin: 16
+                            anchors.right: viewTabs.left
+                            anchors.rightMargin: 6
                             anchors.verticalCenter: parent.verticalCenter
                             font.pixelSize: 13
                             color: "#1F2328"
@@ -617,6 +669,58 @@ Window {
                             onActiveFocusChanged: {
                                 if (!activeFocus && managerWindow.renaming)
                                     managerWindow.commitRename();
+                            }
+                        }
+
+                        Row {
+                            id: viewTabs
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 4
+
+                            Rectangle {
+                                width: 44
+                                height: 22
+                                radius: 6
+                                color: managerWindow.todoMode ? "#F3F4F6" : "#EAF1FF"
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: qsTr("窗口")
+                                    font.pixelSize: 11
+                                    color: managerWindow.todoMode ? "#4B5563" : "#2563EB"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        managerWindow.todoMode = false;
+                                        managerWindow.refreshDetails();
+                                        managerWindow.refreshTodos();
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: 74
+                                height: 22
+                                radius: 6
+                                color: managerWindow.todoMode ? "#EAF1FF" : "#F3F4F6"
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: qsTr("待办") + " (" + managerWindow.pendingTodoCount + ")"
+                                    font.pixelSize: 11
+                                    color: managerWindow.todoMode ? "#2563EB" : "#4B5563"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        managerWindow.todoMode = true;
+                                        managerWindow.refreshTodos();
+                                    }
+                                }
                             }
                         }
 
@@ -838,6 +942,7 @@ Window {
                     // 位置预览: 显示器与窗口的虚拟分布
                     Rectangle {
                         id: previewBox
+                        visible: !managerWindow.todoMode
                         anchors.top: drawerHotkeyRow.bottom
                         anchors.topMargin: 8
                         anchors.left: parent.left
@@ -951,9 +1056,212 @@ Window {
                         }
                     }
 
+                    // 待办输入
+                    Row {
+                        id: todoInputRow
+                        visible: managerWindow.todoMode
+                        anchors.top: drawerHotkeyRow.bottom
+                        anchors.topMargin: 8
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        height: 26
+                        spacing: 6
+
+                        Rectangle {
+                            width: parent.width - 52
+                            height: 26
+                            radius: 7
+                            color: "#F7F8FA"
+                            border.width: 1
+                            border.color: "#E5E7EB"
+
+                            TextInput {
+                                id: todoInput
+                                anchors.fill: parent
+                                anchors.leftMargin: 8
+                                anchors.rightMargin: 8
+                                verticalAlignment: TextInput.AlignVCenter
+                                font.pixelSize: 12
+                                color: "#1F2328"
+                                placeholderText: qsTr("新增待办, 回车或点添加")
+                                selectByMouse: true
+                                clip: true
+                                onAccepted: managerWindow.addTodo()
+                            }
+                        }
+
+                        Rectangle {
+                            width: 46
+                            height: 26
+                            radius: 7
+                            color: "#EAF1FF"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: qsTr("添加")
+                                font.pixelSize: 11
+                                color: "#2563EB"
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: managerWindow.addTodo()
+                            }
+                        }
+                    }
+
+                    // 待办列表
+                    ListView {
+                        id: todoListView
+                        visible: managerWindow.todoMode
+                        anchors.top: todoInputRow.bottom
+                        anchors.topMargin: 6
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: todoBottomArea.top
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        anchors.bottomMargin: 8
+                        spacing: 4
+                        clip: true
+                        model: managerWindow.todoItems
+
+                        delegate: Item {
+                            width: todoListView.width
+                            height: 28
+                            property bool isDone: modelData.done
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: 7
+                                color: isDone ? "#F7F8FA" : "#FFFFFF"
+                                border.width: 1
+                                border.color: "#E5E7EB"
+                            }
+
+                            Rectangle {
+                                width: 16
+                                height: 16
+                                radius: 4
+                                anchors.left: parent.left
+                                anchors.leftMargin: 6
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: isDone ? "#2563EB" : "#FFFFFF"
+                                border.width: 1
+                                border.color: isDone ? "#2563EB" : "#D1D5DB"
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    visible: isDone
+                                    text: "✓"
+                                    font.pixelSize: 10
+                                    color: "#FFFFFF"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: managerWindow.toggleTodo(modelData.index, !isDone)
+                                }
+                            }
+
+                            TextInput {
+                                id: todoTextInput
+                                anchors.left: parent.left
+                                anchors.leftMargin: 28
+                                anchors.right: todoRemoveButton.left
+                                anchors.rightMargin: 6
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: modelData.text
+                                font.pixelSize: 12
+                                font.strikeout: isDone
+                                color: isDone ? "#9AA0A6" : "#1F2328"
+                                selectByMouse: true
+                                clip: true
+                                onAccepted: focus = false
+                                onEditingFinished: managerWindow.updateTodo(modelData.index, text)
+                            }
+
+                            Rectangle {
+                                id: todoRemoveButton
+                                width: 18
+                                height: 18
+                                radius: 5
+                                anchors.right: parent.right
+                                anchors.rightMargin: 6
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: "#FDE8E8"
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "×"
+                                    font.pixelSize: 12
+                                    color: "#DC2626"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: managerWindow.removeTodo(modelData.index)
+                                }
+                            }
+                        }
+                    }
+
+                    Text {
+                        visible: managerWindow.todoMode && todoListView.count === 0
+                        anchors.top: todoInputRow.bottom
+                        anchors.topMargin: 18
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: qsTr("还没有待办")
+                        font.pixelSize: 11
+                        color: "#9AA0A6"
+                    }
+
+                    // 待办底部操作
+                    Row {
+                        id: todoBottomArea
+                        visible: managerWindow.todoMode
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 10
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        height: 24
+                        spacing: 8
+
+                        Rectangle {
+                            width: 86
+                            height: 24
+                            radius: 7
+                            color: "#F3F4F6"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: qsTr("清除已完成")
+                                font.pixelSize: 11
+                                color: "#4B5563"
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: managerWindow.clearCompletedTodos()
+                            }
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("未完成 ") + managerWindow.pendingTodoCount + qsTr(" 条")
+                            font.pixelSize: 11
+                            color: "#6B7280"
+                        }
+                    }
+
                     // 搜索框: 输入关键字后, 下方列表变为搜索结果
                     Rectangle {
                         id: searchBox
+                        visible: !managerWindow.todoMode
                         anchors.top: previewBox.bottom
                         anchors.topMargin: 8
                         anchors.left: parent.left
@@ -1002,6 +1310,7 @@ Window {
                     // 窗口清单, 未搜索时显示抽屉条目, 搜索时显示结果并可加入
                     ListView {
                         id: detailListView
+                        visible: !managerWindow.todoMode
                         anchors.top: searchBox.bottom
                         anchors.topMargin: 6
                         anchors.left: parent.left
@@ -1096,6 +1405,7 @@ Window {
                     // 底部: 左侧操作按钮, 右侧状态消息
                     Row {
                         id: bottomArea
+                        visible: !managerWindow.todoMode
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 10
                         anchors.left: parent.left

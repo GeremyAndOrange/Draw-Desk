@@ -32,14 +32,14 @@
 |---|---|
 | `Src/Main.cpp` | 程序入口, 初始化日志, 配置, 单实例, 托盘, 热键与 QML 界面 |
 | `Src/Readme.md` | 源码目录结构与构建运行入口 |
-| `Src/Models/Drawer.h` | 抽屉, 窗口规则与布局快照数据结构 |
+| `Src/Models/Drawer.h` | 抽屉, 窗口规则, 布局与待办数据结构 |
 | `Src/Platform/Log.h/.cpp` | 日志初始化与数据目录解析 |
 | `Src/Platform/ConfigStore.h/.cpp` | 配置读写, 默认配置, 抽屉与快捷键序列化 |
 | `Src/Platform/WindowApi.h/.cpp` | 窗口枚举, 规则匹配, DWM 隐藏与显示, 布局读写, 前台跟踪 |
 | `Src/Platform/HotkeyService.h/.cpp` | 全局热键注册, 解析与消息分发 |
 | `Src/Platform/TrayIcon.h/.cpp` | Win32 Shell_NotifyIcon 托盘图标与菜单 |
 | `Src/Platform/SingleInstance.h/.cpp` | 命名互斥体单实例控制 |
-| `Src/Services/DrawerService.h/.cpp` | 抽屉切换, 规则匹配, 布局快照, 隐藏状态与恢复 |
+| `Src/Services/DrawerService.h/.cpp` | 抽屉切换, 规则匹配, 布局快照, 待办, 隐藏状态与恢复 |
 | `Src/Services/SelfTest.h/.cpp` | 启动自检, 使用受控测试窗口验证平台能力 |
 | `Src/Ui/Main.qml` | 主窗口, 悬浮窗, 搜索, 规则编辑与设置界面 |
 | `Src/Ui/AppIcon.h/.cpp` | 把内置 SVG 渲染为托盘图标句柄 |

@@ -15,6 +15,12 @@ struct WindowRule {
     bool useRegex = false;
 };
 
+// 抽屉待办
+struct TodoItem {
+    QString text;
+    bool done = false;
+};
+
 // 窗口布局快照
 struct WindowLayout {
     QString process;
@@ -32,6 +38,7 @@ struct Drawer {
     QString hotkey;   // 切换键位, 与全局前缀组合使用, 空表示不设置
     QVector<WindowRule> rules;
     QVector<WindowLayout> layout;
+    QVector<TodoItem> todos;
 };
 
 }

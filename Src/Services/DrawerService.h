@@ -77,6 +77,15 @@ public:
     Q_INVOKABLE bool UpdateRule(int drawerIndex, int ruleIndex, const QString &process,
                                 const QString &titlePattern, int processId, bool useRegex);
 
+    // 抽屉待办: 列表按未完成在前, 已完成在后返回
+    Q_INVOKABLE QVariantList TodoItems(int drawerIndex) const;
+    Q_INVOKABLE int PendingTodoCount(int drawerIndex) const;
+    Q_INVOKABLE bool AddTodo(int drawerIndex, const QString &text);
+    Q_INVOKABLE bool SetTodoDone(int drawerIndex, int todoIndex, bool done);
+    Q_INVOKABLE bool UpdateTodoText(int drawerIndex, int todoIndex, const QString &text);
+    Q_INVOKABLE bool RemoveTodo(int drawerIndex, int todoIndex);
+    Q_INVOKABLE int ClearCompletedTodos(int drawerIndex);
+
     // 搜索窗口, 返回用于显示的文本列表
     Q_INVOKABLE QStringList SearchWindows(const QString &keyword);
 
@@ -117,6 +126,7 @@ signals:
     void drawersChanged();
     void activeIndexChanged();
     void noticeChanged();
+    void todosChanged();
 
     void hotkeySettingsChanged();
 

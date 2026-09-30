@@ -18,6 +18,7 @@
 namespace {
 
 const QString kHotkeyPrefix = QStringLiteral("Ctrl+Alt");
+constexpr int kMaxTodoLength = 200;
 
 }
 
@@ -511,6 +512,156 @@ bool DrawerService::UpdateRule(int drawerIndex, int ruleIndex, const QString &pr
     Notify(QStringLiteral("规则已更新"));
     ApplyVisibility();
     return true;
+}
+
+QVariantList DrawerService::TodoItems(int drawerIndex) const
+{
+    QVariantList list;
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return list;
+
+    const auto &todos = m_drawers.at(drawerIndex).todos;
+    auto append = [&list](int index, const Models::TodoItem &todo) {
+        QVariantMap item;
+        item[QStringLiteral("index")] = index;
+        item[QStringLiteral("text")] = todo.text;
+        item[QStringLiteral("done")] = todo.done;
+        list.append(item);
+    };
+
+    // 未完成在前, 已完成在后
+    for (int i = 0; i < todos.size(); ++i) {
+        if (!todos.at(i).done)
+            append(i, todos.at(i));
+    }
+    for (int i = 0; i < todos.size(); ++i) {
+        if (todos.at(i).done)
+            append(i, todos.at(i));
+    }
+    return list;
+}
+
+int DrawerService::PendingTodoCount(int drawerIndex) const
+{
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return 0;
+
+    int count = 0;
+    for (const auto &todo : m_drawers.at(drawerIndex).todos) {
+        if (!todo.done)
+            ++count;
+    }
+    return count;
+}
+
+bool DrawerService::AddTodo(int drawerIndex, const QString &text)
+{
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return false;
+
+    const QString trimmed = text.trimmed();
+    if (trimmed.isEmpty()) {
+        Notify(QStringLiteral("待办内容不能为空"));
+        return false;
+    }
+    if (trimmed.size() > kMaxTodoLength) {
+        Notify(QStringLiteral("待办内容不能超过 %1 个字符").arg(kMaxTodoLength));
+        return false;
+    }
+
+    Models::TodoItem todo;
+    todo.text = trimmed;
+    m_drawers[drawerIndex].todos.append(todo);
+
+    if (m_persistChanges)
+        ConfigStore::SaveDrawers(m_drawers);
+    emit todosChanged();
+    return true;
+}
+
+bool DrawerService::SetTodoDone(int drawerIndex, int todoIndex, bool done)
+{
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return false;
+
+    auto &todos = m_drawers[drawerIndex].todos;
+    if (todoIndex < 0 || todoIndex >= todos.size())
+        return false;
+    if (todos.at(todoIndex).done == done)
+        return true;
+
+    todos[todoIndex].done = done;
+    if (m_persistChanges)
+        ConfigStore::SaveDrawers(m_drawers);
+    emit todosChanged();
+    return true;
+}
+
+bool DrawerService::UpdateTodoText(int drawerIndex, int todoIndex, const QString &text)
+{
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return false;
+
+    auto &todos = m_drawers[drawerIndex].todos;
+    if (todoIndex < 0 || todoIndex >= todos.size())
+        return false;
+
+    const QString trimmed = text.trimmed();
+    if (trimmed.isEmpty()) {
+        Notify(QStringLiteral("待办内容不能为空"));
+        return false;
+    }
+    if (trimmed.size() > kMaxTodoLength) {
+        Notify(QStringLiteral("待办内容不能超过 %1 个字符").arg(kMaxTodoLength));
+        return false;
+    }
+    if (todos.at(todoIndex).text == trimmed)
+        return true;
+
+    todos[todoIndex].text = trimmed;
+    if (m_persistChanges)
+        ConfigStore::SaveDrawers(m_drawers);
+    emit todosChanged();
+    return true;
+}
+
+bool DrawerService::RemoveTodo(int drawerIndex, int todoIndex)
+{
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return false;
+
+    auto &todos = m_drawers[drawerIndex].todos;
+    if (todoIndex < 0 || todoIndex >= todos.size())
+        return false;
+
+    todos.removeAt(todoIndex);
+    if (m_persistChanges)
+        ConfigStore::SaveDrawers(m_drawers);
+    emit todosChanged();
+    return true;
+}
+
+int DrawerService::ClearCompletedTodos(int drawerIndex)
+{
+    if (drawerIndex < 0 || drawerIndex >= m_drawers.size())
+        return 0;
+
+    auto &todos = m_drawers[drawerIndex].todos;
+    int removed = 0;
+    for (int i = todos.size() - 1; i >= 0; --i) {
+        if (todos.at(i).done) {
+            todos.removeAt(i);
+            ++removed;
+        }
+    }
+
+    if (removed > 0) {
+        if (m_persistChanges)
+            ConfigStore::SaveDrawers(m_drawers);
+        emit todosChanged();
+        Notify(QStringLiteral("已清除 %1 条已完成待办").arg(removed));
+    }
+    return removed;
 }
 
 QStringList DrawerService::SearchWindows(const QString &keyword)
