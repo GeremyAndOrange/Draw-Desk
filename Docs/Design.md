@@ -17,36 +17,40 @@
 
 ## 2. 总体架构
 
-本节给出三层结构与数据流.
+本节给出分层结构与数据流.
 
 ---
 
 ```
-界面层
+界面层  Src\Ui\
   Main.qml           主窗口(含搜索与详情), 悬浮窗, 按需创建独立窗口
-  TrayIcon           托盘图标与菜单, Win32 Shell_NotifyIcon 实现
+  AppIcon            内置 SVG 渲染为托盘图标句柄
 
-服务层
+服务层  Src\Services\
   DrawerService      抽屉模型, 规则匹配, 切换编排, 布局快照, 添加与移除窗口
   SelfTest           受控窗口自检, 覆盖 Cloak, 切换与布局
-  HotkeyService      全局热键注册与分发
 
-平台层
+平台层  Src\Platform\
   WindowApi          枚举, 规则匹配, 显示与隐藏, 布局读写, 前台激活
+  HotkeyService      全局热键注册与分发
+  TrayIcon           托盘图标与菜单, Win32 Shell_NotifyIcon 实现
   ConfigStore        配置读写, 原子写入
   SingleInstance     命名互斥体单实例
   Log                日志
 
+数据模型  Src\Models\
+  Drawer             抽屉, 窗口规则, 布局快照与待办
+
 数据
-  %APPDATA%\DrawDesk\DrawDesk\Config.json     用户配置, 已实现
+  %APPDATA%\DrawDesk\DrawDesk\Config.json     用户配置
   %APPDATA%\DrawDesk\DrawDesk\Cloaked.json   当前被隐藏窗口的状态, 正常退出时删除
-  %APPDATA%\DrawDesk\DrawDesk\Logs\          日志, 已实现
+  %APPDATA%\DrawDesk\DrawDesk\Logs\          日志, 按天写入
 ```
 
-- 依赖方向自上而下, 服务层不直接调用 Win32,平台层不含业务规则
-- 所有窗口相关调用集中在平台层, 便于集中处理失败, 权限与日志
-- 数据根目录默认 `%APPDATA%\DrawDesk\DrawDesk`,可由环境变量 `DRAWDESK_DATA_DIR` 覆盖;
-  开发与测试时运行脚本将其指向项目内 `Build\DevData`,不写入系统目录
+- 分组与 `Src\` 下的四个目录一一对应, 依赖方向自上而下
+- 服务层不直接调用 Win32, 平台层不含业务规则; 现存偏离记在 `Memory\CppQt.md` 第 6 节的警示
+- 数据根目录默认 `%APPDATA%\DrawDesk\DrawDesk`, 可由环境变量 `DRAWDESK_DATA_DIR` 覆盖;
+  开发与测试时运行脚本将其指向项目内 `Build\DevData`, 不写入系统目录
 
 ## 3. 代码组织
 
