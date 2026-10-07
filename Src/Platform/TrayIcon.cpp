@@ -122,7 +122,6 @@ bool Create(HINSTANCE instance, HICON icon, Callbacks callbacks)
     return Shell_NotifyIconW(NIM_ADD, &g_iconData) != FALSE;
 }
 
-
 void Destroy()
 {
     if (!g_window)

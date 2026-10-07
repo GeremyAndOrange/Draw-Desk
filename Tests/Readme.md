@@ -8,7 +8,7 @@
 
 | 文件 | 说明 |
 |---|---|
-| `DrawDeskTests.h` / `DrawDeskTests.cpp` | Qt Test 单元测试, 覆盖热键解析, 规则匹配, 配置序列化与旧配置迁移 |
+| `DrawDeskTests.h` / `DrawDeskTests.cpp` | Qt Test 单元测试, 覆盖热键解析, 规则匹配, 配置序列化, 旧配置迁移与待办增删改 |
 | `Test.md` | 每次测试执行结果记录 |
 
 ## 运行

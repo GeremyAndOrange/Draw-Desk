@@ -48,7 +48,7 @@ public:
     // 从抽屉移除指定序号的窗口条目
     Q_INVOKABLE void RemoveRule(int drawerIndex, int ruleIndex);
 
-    // 返回抽屉内窗口的详情, 每项为两行文本(窗口与位置)
+    // 返回抽屉内窗口的详情, 每项为两行文本, 窗口与位置
     Q_INVOKABLE QStringList DrawerWindowDetails(int index) const;
 
     // 返回窗口矩形列表, 用于图形化预览
@@ -56,7 +56,6 @@ public:
 
     // 返回显示器布局列表
     Q_INVOKABLE QVariantList MonitorLayout() const;
-
 
     // 抽屉管理: 添加, 重命名, 删除, 调整顺序
     Q_INVOKABLE void AddDrawer(const QString &name);
@@ -85,7 +84,6 @@ public:
     Q_INVOKABLE bool UpdateTodoText(int drawerIndex, int todoIndex, const QString &text);
     Q_INVOKABLE bool RemoveTodo(int drawerIndex, int todoIndex);
 
-
     // 搜索窗口, 返回用于显示的文本列表
     Q_INVOKABLE QStringList SearchWindows(const QString &keyword);
 
@@ -95,7 +93,6 @@ public:
     // 激活搜索结果
     Q_INVOKABLE void ActivateSearchResult(int resultIndex);
 
-
     // 打开配置文件所在文件夹
     Q_INVOKABLE void OpenConfigFolder();
 
@@ -104,7 +101,7 @@ public:
     Q_INVOKABLE QString HotkeyRemoveWindow();
     Q_INVOKABLE bool SaveWindowHotkeys(const QString &addWindow, const QString &removeWindow);
 
-    // 抽屉自身的切换键位, 与全局前缀组合;空表示不设置
+    // 抽屉自身的切换键位, 与全局前缀组合; 空表示不设置
     Q_INVOKABLE QString DrawerHotkey(int index) const;
     Q_INVOKABLE bool SaveDrawerHotkey(int index, const QString &key);
 

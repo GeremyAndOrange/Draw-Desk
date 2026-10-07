@@ -228,6 +228,7 @@ void DrawerService::RestoreAll()
     else
         Notify(QStringLiteral("没有需要恢复的窗口"));
 }
+
 void DrawerService::QuitApplication()
 {
     qInfo("已请求退出程序");
@@ -289,7 +290,6 @@ QVariantList DrawerService::DrawerPreview(int index) const
     }
     return list;
 }
-
 
 QVariantList DrawerService::MonitorLayout() const
 {
@@ -374,7 +374,6 @@ void DrawerService::RemoveDrawer(int index)
     ApplyVisibility();
     Notify(QStringLiteral("已删除抽屉 ") + removedName);
 }
-
 
 void DrawerService::MoveDrawerUp(int index)
 {
@@ -732,7 +731,6 @@ void DrawerService::ActivateSearchResult(int resultIndex)
     Notify(QStringLiteral("已切换到窗口"));
 }
 
-
 void DrawerService::OpenConfigFolder()
 {
     ConfigStore::EnsureDefaultConfig();
@@ -878,6 +876,7 @@ bool DrawerService::SaveWindowHotkeys(const QString &addWindow, const QString &r
         Notify(QStringLiteral("快捷键已保存, 部分组合被其他程序占用, 请更换"));
     return true;
 }
+
 int DrawerService::CaptureDesktopToDrawer(int index)
 {
     if (index < 0 || index >= m_drawers.size())
@@ -1139,6 +1138,7 @@ void DrawerService::RestoreLayout(int index)
         }
     }
 }
+
 void DrawerService::ApplyVisibility()
 {
     int matched = 0;

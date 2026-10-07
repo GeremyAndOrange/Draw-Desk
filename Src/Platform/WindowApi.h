@@ -87,10 +87,8 @@ void RefreshWindow(HWND handle);
 // 等待 DWM 处理完当前合成队列
 void FlushComposition();
 
-
 // 确保窗口可见并激活到前台
 void UncloakAndActivate(HWND handle);
-
 
 // 启动前台窗口监听, 记录最近的非本进程前台窗口
 void StartForegroundWatcher();

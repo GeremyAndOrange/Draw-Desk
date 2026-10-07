@@ -7,7 +7,7 @@
 
 namespace DrawDesk::Models {
 
-// 窗口匹配规则, 进程名精确匹配, 标题按字面或正则匹配;标题为空时只匹配进程
+// 窗口匹配规则, 进程名精确匹配, 标题按字面或正则匹配; 标题为空时只匹配进程
 struct WindowRule {
     QString process;
     QString titlePattern;

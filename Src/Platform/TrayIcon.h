@@ -17,7 +17,6 @@ struct Callbacks {
 // 创建托盘图标与隐藏消息窗口
 bool Create(HINSTANCE instance, HICON icon, Callbacks callbacks);
 
-
 // 移除托盘图标并销毁消息窗口
 void Destroy();
 

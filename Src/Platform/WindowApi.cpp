@@ -307,7 +307,7 @@ bool MatchesRule(const WindowInfo &info, const Models::WindowRule &rule)
     if (rule.titlePattern.isEmpty())
         return true;
 
-    // 标题先按字面精确比较;只有显式开启正则匹配时才按正则处理
+    // 标题先按字面精确比较; 只有显式开启正则匹配时才按正则处理
     if (info.title == rule.titlePattern)
         return true;
     if (!rule.useRegex)
@@ -398,7 +398,6 @@ void UncloakAndActivate(HWND handle)
     RefreshWindow(handle);
     SetForegroundWindow(handle);
 }
-
 
 void StartForegroundWatcher()
 {

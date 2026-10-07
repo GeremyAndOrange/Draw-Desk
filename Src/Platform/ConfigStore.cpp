@@ -18,7 +18,6 @@ QJsonObject DefaultRoot()
 {
     QJsonObject settings;
 
-
     QJsonObject hotkeys;
     hotkeys[QStringLiteral("addWindow")] = QStringLiteral("Ctrl+Alt+Z");
     hotkeys[QStringLiteral("removeWindow")] = QStringLiteral("Ctrl+Alt+X");

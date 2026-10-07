@@ -133,7 +133,8 @@ int main(int argc, char *argv[])
                 1, removeModifiers, removeKey, [&drawerService]() {
                     drawerService.RemoveForegroundWindowFromDrawer(drawerService.ActiveIndex());
                 });
-        qInfo().noquote() << "热键 移出窗口 注册:" << (removeOk ? "成功" : "失败");    };
+        qInfo().noquote() << "热键 移出窗口 注册:" << (removeOk ? "成功" : "失败");
+    };
 
     registerHotkeys();
     QObject::connect(&drawerService, &DrawDesk::Services::DrawerService::hotkeySettingsChanged,

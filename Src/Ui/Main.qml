@@ -58,7 +58,6 @@ Window {
         floatShowTimer.start();
     }
 
-
     Component.onCompleted: {
         var savedX = drawerService.FloatingWindowX();
         var savedY = drawerService.FloatingWindowY();
@@ -71,7 +70,6 @@ Window {
         interval: 150
         onTriggered: window.visible = true
     }
-
 
     Rectangle {
         id: bar
@@ -191,7 +189,6 @@ Window {
             }
         }
 
-
     }
 
     DragHandler {
@@ -211,7 +208,6 @@ Window {
         interval: 500
         onTriggered: drawerService.SaveFloatingPosition(window.x, window.y)
     }
-
 
     // 主窗口: 抽屉管理, 窗口详情与切换
     Component {
@@ -1218,8 +1214,6 @@ Window {
                         color: "#9AA0A6"
                     }
 
-
-
                     // 搜索框: 输入关键字后, 下方列表变为搜索结果
                     Rectangle {
                         id: searchBox
@@ -1619,7 +1613,7 @@ Window {
                         anchors.topMargin: 140
                         anchors.left: parent.left
                         anchors.leftMargin: 16
-                        text: qsTr("PID 匹配(可选, 0 或不填为不启用)")
+                        text: qsTr("PID 匹配, 可选, 0 或不填为不启用")
                         font.pixelSize: 11
                         color: "#6B7280"
                     }
@@ -1648,8 +1642,6 @@ Window {
                             clip: true
                         }
                     }
-
-
 
                     Row {
                         anchors.bottom: parent.bottom

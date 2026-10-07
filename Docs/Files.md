@@ -1,10 +1,10 @@
 # 文件说明
 
-说明句:按目录说明 DrawDesk 中每个文件与文件夹的作用, 便于维护与交接.
+说明句: 按目录说明 DrawDesk 中每个文件与文件夹的作用, 便于维护与交接.
 
 ---
 
-## 一. 根目录
+## 1. 根目录
 
 | 文件 | 作用 |
 |---|---|
@@ -15,7 +15,7 @@
 | `.gitattributes` | 统一 LF 行尾 |
 | `LICENSE` | DrawDesk 自身代码的 MIT 许可证 |
 
-## 二. Docs
+## 2. Docs
 
 | 文件 | 作用 |
 |---|---|
@@ -26,7 +26,7 @@
 | `Docs/Manual.md` | 编译, 部署, 运行, 日常操作与紧急恢复 |
 | `Docs/Files.md` | 本文件, 项目文件清单与用途 |
 
-## 三. Src
+## 3. Src
 
 | 文件 | 作用 |
 |---|---|
@@ -47,7 +47,7 @@
 | `Src/Resources/DrawDesk.rc` | Windows 资源脚本, 关联 exe 图标 |
 | `Src/Resources/DrawDesk.ico` | Windows 可执行文件图标 |
 
-## 四. Tests
+## 4. Tests
 
 | 文件 | 作用 |
 |---|---|
@@ -56,7 +56,7 @@
 | `Tests/Readme.md` | 测试目录说明与运行方式 |
 | `Tests/Test.md` | 单元测试执行结果记录 |
 
-## 五. Scripts
+## 5. Scripts
 
 | 文件 | 作用 |
 |---|---|
@@ -66,7 +66,7 @@
 | `Scripts/Run.ps1` | 使用项目内数据目录运行程序, 支持冒烟与自检模式, 依赖 Qt 解析结果 |
 | `Scripts/Package.ps1` | 一键打包: Release 构建, Deploy, 生成便携 ZIP 并调用 Inno Setup |
 
-## 六. Installer
+## 6. Installer
 
 | 文件 | 作用 |
 |---|---|

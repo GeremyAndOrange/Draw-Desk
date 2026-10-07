@@ -163,7 +163,6 @@ bool ParseHotkey(const QString &text, UINT *modifiers, UINT *virtualKey)
     return true;
 }
 
-
 bool Start()
 {
     if (g_window)
